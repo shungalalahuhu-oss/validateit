@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ValidateIt — AI Business Idea Validator</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@300;400;500&family=Geist:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0a0a;
+  --bg2: #111111;
+  --bg3: #1a1a1a;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.12);
+  --text: #f0ede8;
+  --muted: #7a7570;
+  --accent: #c8f53a;
+  --accent2: #ff6b35;
+  --red: #ff4444;
+  --green: #3affa0;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{background:var(--bg);color:var(--text);font-family:'Geist',sans-serif;min-height:100vh;overflow-x:hidden;}
+
+body::before{
+  content:'';position:fixed;inset:0;
+  background:radial-gradient(ellipse 80% 50% at 20% -10%,rgba(200,245,58,0.06) 0%,transparent 60%),
+             radial-gradient(ellipse 60% 40% at 80% 110%,rgba(255,107,53,0.05) 0%,transparent 60%);
+  pointer-events:none;z-index:0;
+}
+
+.noise{
+  position:fixed;inset:0;opacity:0.035;pointer-events:none;z-index:1;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.container{max-width:760px;margin:0 auto;padding:0 24px;position:relative;z-index:2;}
+
+nav{padding:20px 0;display:flex;justify-content:space-between;align-items:center;border-bottom:0.5px solid var(--border);}
+.logo{font-family:'Instrument Serif',serif;font-size:20px;letter-spacing:-0.3px;color:var(--text);}
+.logo span{color:var(--accent);}
+.nav-tag{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);border:0.5px solid var(--border2);padding:4px 10px;border-radius:4px;letter-spacing:1px;}
+
+.hero{padding:80px 0 60px;text-align:center;}
+.hero-kicker{font-family:'DM Mono',monospace;font-size:11px;color:var(--accent);letter-spacing:2px;margin-bottom:24px;display:inline-block;}
+.hero h1{font-family:'Instrument Serif',serif;font-size:clamp(40px,8vw,68px);line-height:1.05;letter-spacing:-1px;color:var(--text);margin-bottom:20px;}
+.hero h1 em{font-style:italic;color:var(--muted);}
+.hero p{font-size:16px;color:var(--muted);line-height:1.7;max-width:480px;margin:0 auto 40px;}
+
+.stats-row{display:flex;justify-content:center;gap:32px;margin-bottom:56px;flex-wrap:wrap;}
+.stat{text-align:center;}
+.stat-num{font-family:'Instrument Serif',serif;font-size:28px;color:var(--accent);}
+.stat-lbl{font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;letter-spacing:0.5px;margin-top:2px;}
+
+.input-card{background:var(--bg2);border:0.5px solid var(--border2);border-radius:16px;padding:28px;margin-bottom:12px;transition:border-color 0.2s;}
+.input-card:focus-within{border-color:rgba(200,245,58,0.3);}
+.input-label{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:1.5px;margin-bottom:12px;display:block;}
+textarea{width:100%;background:transparent;border:none;outline:none;font-family:'Geist',sans-serif;font-size:15px;color:var(--text);resize:none;line-height:1.6;min-height:100px;}
+textarea::placeholder{color:rgba(122,117,112,0.5);}
+
+.options-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px;padding-top:16px;border-top:0.5px solid var(--border);}
+.opt-chip{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);border:0.5px solid var(--border);padding:5px 12px;border-radius:99px;cursor:pointer;transition:all 0.15s;user-select:none;}
+.opt-chip:hover,.opt-chip.on{border-color:var(--accent);color:var(--accent);}
+
+.btn-validate{width:100%;padding:16px;background:var(--accent);color:#0a0a0a;font-family:'Geist',sans-serif;font-size:14px;font-weight:600;border:none;border-radius:12px;cursor:pointer;letter-spacing:0.3px;transition:all 0.15s;position:relative;overflow:hidden;}
+.btn-validate:hover{background:#d4f840;transform:translateY(-1px);}
+.btn-validate:active{transform:translateY(0);}
+.btn-validate:disabled{background:var(--bg3);color:var(--muted);cursor:not-allowed;transform:none;}
+.btn-validate .spinner{display:none;width:16px;height:16px;border:2px solid rgba(0,0,0,0.2);border-top-color:#0a0a0a;border-radius:50%;animation:spin 0.7s linear infinite;margin:0 auto;}
+.btn-validate.loading .btn-txt{display:none;}
+.btn-validate.loading .spinner{display:block;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+.result-section{display:none;margin-top:24px;animation:fadeUp 0.5s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+
+.score-banner{background:var(--bg2);border:0.5px solid var(--border2);border-radius:16px;padding:24px 28px;margin-bottom:12px;display:flex;align-items:center;gap:20px;}
+.score-ring{width:72px;height:72px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.score-num{font-family:'Instrument Serif',serif;font-size:28px;font-weight:400;}
+.score-info{flex:1;}
+.score-title{font-size:16px;font-weight:500;margin-bottom:4px;}
+.score-sub{font-size:13px;color:var(--muted);line-height:1.5;}
+
+.result-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+@media(max-width:500px){.result-grid{grid-template-columns:1fr;}}
+.result-card{background:var(--bg2);border:0.5px solid var(--border2);border-radius:14px;padding:18px 20px;}
+.rc-label{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1.5px;margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+.rc-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.rc-content{font-size:13px;color:var(--muted);line-height:1.65;}
+.rc-content strong{color:var(--text);font-weight:500;}
+
+.result-full{background:var(--bg2);border:0.5px solid var(--border2);border-radius:14px;padding:20px;margin-bottom:10px;}
+.result-full .rc-label{margin-bottom:12px;}
+.result-full .rc-content{font-size:13px;line-height:1.7;}
+
+.risk-list,.opportunity-list{list-style:none;display:flex;flex-direction:column;gap:7px;margin-top:4px;}
+.risk-list li::before{content:'↗ ';color:var(--accent2);}
+.opportunity-list li::before{content:'→ ';color:var(--green);}
+
+.share-row{display:flex;gap:8px;margin-top:12px;}
+.share-btn{flex:1;padding:11px;border-radius:10px;border:0.5px solid var(--border2);background:transparent;color:var(--muted);font-size:12px;font-family:'DM Mono',monospace;cursor:pointer;transition:all 0.15s;letter-spacing:0.5px;}
+.share-btn:hover{color:var(--text);background:var(--bg3);}
+
+.footer{padding:40px 0 32px;text-align:center;border-top:0.5px solid var(--border);margin-top:60px;}
+.footer p{font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;letter-spacing:0.5px;}
+
+.error-msg{background:rgba(255,68,68,0.08);border:0.5px solid rgba(255,68,68,0.2);border-radius:10px;padding:12px 16px;font-size:13px;color:#ff8888;margin-top:10px;display:none;}
+
+.api-note{background:rgba(200,245,58,0.05);border:0.5px solid rgba(200,245,58,0.15);border-radius:10px;padding:14px 18px;font-size:12px;color:var(--muted);margin-bottom:12px;line-height:1.6;}
+.api-note a{color:var(--accent);text-decoration:none;}
+.api-note input{background:var(--bg3);border:0.5px solid var(--border2);border-radius:6px;padding:6px 10px;color:var(--text);font-size:12px;font-family:'DM Mono',monospace;width:100%;margin-top:8px;outline:none;}
+.api-note input:focus{border-color:rgba(200,245,58,0.3);}
+</style>
+</head>
+<body>
+<div class="noise"></div>
+<div class="container">
+
+  <nav>
+    <div class="logo">Validate<span>It</span></div>
+    <div class="nav-tag">BETA · FREE</div>
+  </nav>
+
+  <div class="hero">
+    <div class="hero-kicker">AI-POWERED IDEA VALIDATION</div>
+    <h1>Is your idea<br><em>actually</em> good?</h1>
+    <p>Paste your business idea. Get a brutal, honest AI analysis in 30 seconds — market fit, risks, revenue models, and a viability score.</p>
+    <div class="stats-row">
+      <div class="stat"><div class="stat-num">2,400+</div><div class="stat-lbl">IDEAS VALIDATED</div></div>
+      <div class="stat"><div class="stat-num">30s</div><div class="stat-lbl">AVG ANALYSIS TIME</div></div>
+      <div class="stat"><div class="stat-num">100%</div><div class="stat-lbl">BRUTALLY HONEST</div></div>
+    </div>
+  </div>
+
+  <div class="api-note">
+    <strong style="color:var(--text);">One-time setup:</strong> This tool needs a free Anthropic API key to run.
+    Get yours at <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a> → it's free to start.
+    <input type="password" id="apiKeyInput" placeholder="Paste your API key here: sk-ant-..." />
+  </div>
+
+  <div class="input-card">
+    <label class="input-label">YOUR IDEA</label>
+    <textarea id="ideaInput" placeholder="e.g. An app that helps freelancers automatically track working hours and generate invoices, targeting Indian freelancers who currently use Excel..." rows="4"></textarea>
+    <div class="options-row">
+      <div class="opt-chip on" onclick="toggleChip(this)">Market Analysis</div>
+      <div class="opt-chip on" onclick="toggleChip(this)">Risk Breakdown</div>
+      <div class="opt-chip on" onclick="toggleChip(this)">Revenue Models</div>
+      <div class="opt-chip on" onclick="toggleChip(this)">Competitor Scan</div>
+      <div class="opt-chip" onclick="toggleChip(this)">Pivot Ideas</div>
+    </div>
+  </div>
+
+  <button class="btn-validate" id="validateBtn" onclick="validate()">
+    <span class="btn-txt">Validate My Idea →</span>
+    <div class="spinner"></div>
+  </button>
+  <div class="error-msg" id="errorMsg"></div>
+
+  <div class="result-section" id="resultSection">
+    <div class="score-banner">
+      <div class="score-ring" id="scoreRing">
+        <div class="score-num" id="scoreNum">—</div>
+      </div>
+      <div class="score-info">
+        <div class="score-title" id="scoreTitle">Analysing...</div>
+        <div class="score-sub" id="scoreSub"></div>
+      </div>
+    </div>
+
+    <div class="result-grid">
+      <div class="result-card">
+        <div class="rc-label"><div class="rc-dot" style="background:#3affa0;"></div><span style="color:#3affa0;">MARKET FIT</span></div>
+        <div class="rc-content" id="marketContent">—</div>
+      </div>
+      <div class="result-card">
+        <div class="rc-label"><div class="rc-dot" style="background:#ff6b35;"></div><span style="color:#ff6b35;">TOP RISKS</span></div>
+        <div class="rc-content" id="riskContent">—</div>
+      </div>
+    </div>
+
+    <div class="result-full">
+      <div class="rc-label"><div class="rc-dot" style="background:#c8f53a;"></div><span style="color:#c8f53a;">REVENUE MODELS</span></div>
+      <div class="rc-content" id="revenueContent">—</div>
+    </div>
+
+    <div class="result-full">
+      <div class="rc-label"><div class="rc-dot" style="background:#7a7570;"></div><span style="color:#aaa;">COMPETITORS</span></div>
+      <div class="rc-content" id="competitorContent">—</div>
+    </div>
+
+    <div class="result-full" id="pivotSection" style="display:none;">
+      <div class="rc-label"><div class="rc-dot" style="background:#c8a0ff;"></div><span style="color:#c8a0ff;">PIVOT IDEAS</span></div>
+      <div class="rc-content" id="pivotContent">—</div>
+    </div>
+
+    <div class="share-row">
+      <button class="share-btn" onclick="copyReport()">Copy Report</button>
+      <button class="share-btn" onclick="resetForm()">Validate Another →</button>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <p>ValidateIt · Built for founders who hate wasting time</p>
+  </footer>
+</div>
+
+<script>
+function toggleChip(el){ el.classList.toggle('on'); }
+
+function scoreColor(s){
+  if(s>=70) return '#3affa0';
+  if(s>=45) return '#c8f53a';
+  return '#ff6b35';
+}
+
+function scoreLabel(s){
+  if(s>=75) return ['Strong Opportunity','This idea has real legs. Execution is everything now.'];
+  if(s>=55) return ['Viable with Work','Solid foundation but needs refinement before launch.'];
+  if(s>=35) return ['Risky Bet','Possible, but the odds are stacked against you right now.'];
+  return ['Hard Pass','Significant structural problems. Consider pivoting.'];
+}
+
+async function validate(){
+  const idea = document.getElementById('ideaInput').value.trim();
+  const apiKey = document.getElementById('apiKeyInput').value.trim();
+
+  if(!apiKey){
+    showError('Paste your Anthropic API key above first. Get one free at console.anthropic.com');
+    return;
+  }
+  if(!idea || idea.length < 20){
+    showError('Give me more to work with — describe your idea in at least a sentence.');
+    return;
+  }
+
+  const chips = [...document.querySelectorAll('.opt-chip.on')].map(c => c.textContent);
+  const wantPivot = document.querySelectorAll('.opt-chip')[4].classList.contains('on');
+
+  const btn = document.getElementById('validateBtn');
+  btn.disabled = true;
+  btn.classList.add('loading');
+  document.getElementById('errorMsg').style.display = 'none';
+  document.getElementById('resultSection').style.display = 'none';
+
+  const prompt = `You are a brutally honest startup advisor. Analyse this business idea and respond ONLY in the following JSON format, no markdown, no extra text:
+
+{
+  "viability_score": <number 1-100>,
+  "score_label": "<one punchy sentence verdict>",
+  "market_fit": "<2-3 sentences on target market, demand, timing>",
+  "top_risks": ["<risk 1>","<risk 2>","<risk 3>"],
+  "revenue_models": ["<model 1 with brief explanation>","<model 2>","<model 3>"],
+  "competitors": "<2-3 sentences naming real competitors and how to differentiate>",
+  "pivot_ideas": ["<pivot 1>","<pivot 2>","<pivot 3>"]
+}
+
+Business idea: ${idea}
+Requested sections: ${chips.join(', ')}
+Be specific, name real markets and real numbers where possible. Do not sugarcoat.`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    const data = await res.json();
+    if(data.error){ throw new Error(data.error.message); }
+    if(!data.content){ throw new Error('No response from API'); }
+
+    const raw = data.content.map(b => b.text || '').join('');
+    const clean = raw.replace(/```json|```/g,'').trim();
+    const parsed = JSON.parse(clean);
+    renderResult(parsed, wantPivot);
+
+  } catch(e) {
+    showError('Error: ' + (e.message || 'Something went wrong. Check your API key and try again.'));
+    btn.disabled = false;
+    btn.classList.remove('loading');
+  }
+}
+
+function renderResult(d, showPivot){
+  const score = Math.min(100, Math.max(1, d.viability_score || 50));
+  const col = scoreColor(score);
+  const [label, sub] = scoreLabel(score);
+
+  document.getElementById('scoreNum').textContent = score;
+  document.getElementById('scoreNum').style.color = col;
+  document.getElementById('scoreRing').style.border = `2px solid ${col}`;
+  document.getElementById('scoreRing').style.boxShadow = `0 0 20px ${col}33`;
+  document.getElementById('scoreTitle').textContent = d.score_label || label;
+  document.getElementById('scoreSub').textContent = sub;
+
+  document.getElementById('marketContent').innerHTML = '<strong>Market fit:</strong> ' + (d.market_fit || '—');
+
+  const risks = d.top_risks || [];
+  document.getElementById('riskContent').innerHTML = '<ul class="risk-list">' + risks.map(r => `<li>${r}</li>`).join('') + '</ul>';
+
+  const rev = d.revenue_models || [];
+  document.getElementById('revenueContent').innerHTML = '<ul class="opportunity-list">' + rev.map(r => `<li>${r}</li>`).join('') + '</ul>';
+
+  document.getElementById('competitorContent').innerHTML = d.competitors || '—';
+
+  if(showPivot && d.pivot_ideas){
+    const piv = d.pivot_ideas || [];
+    document.getElementById('pivotContent').innerHTML = '<ul class="opportunity-list">' + piv.map(p => `<li>${p}</li>`).join('') + '</ul>';
+    document.getElementById('pivotSection').style.display = 'block';
+  }
+
+  const btn = document.getElementById('validateBtn');
+  btn.disabled = false;
+  btn.classList.remove('loading');
+
+  const rs = document.getElementById('resultSection');
+  rs.style.display = 'block';
+  rs.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function showError(msg){
+  const e = document.getElementById('errorMsg');
+  e.textContent = msg;
+  e.style.display = 'block';
+  const btn = document.getElementById('validateBtn');
+  btn.disabled = false;
+  btn.classList.remove('loading');
+}
+
+function resetForm(){
+  document.getElementById('ideaInput').value = '';
+  document.getElementById('resultSection').style.display = 'none';
+  document.getElementById('pivotSection').style.display = 'none';
+  document.getElementById('ideaInput').focus();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function copyReport(){
+  const ids = ['scoreTitle','marketContent','riskContent','revenueContent','competitorContent'];
+  const text = ids.map(id => document.getElementById(id).innerText).join('\n\n');
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = event.target;
+    const orig = btn.textContent;
+    btn.textContent = 'Copied ✓';
+    setTimeout(() => btn.textContent = orig, 2000);
+  });
+}
+</script>
+</body>
+</html>
