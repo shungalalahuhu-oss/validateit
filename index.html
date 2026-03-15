@@ -6,19 +6,7 @@
 <title>ValidateIt — AI Business Idea Validator</title>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@300;400;500&family=Geist:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg: #0a0a0a;
-  --bg2: #111111;
-  --bg3: #1a1a1a;
-  --border: rgba(255,255,255,0.07);
-  --border2: rgba(255,255,255,0.12);
-  --text: #f0ede8;
-  --muted: #7a7570;
-  --accent: #c8f53a;
-  --accent2: #ff6b35;
-  --red: #ff4444;
-  --green: #3affa0;
-}
+:root{--bg:#0a0a0a;--bg2:#111111;--bg3:#1a1a1a;--border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.12);--text:#f0ede8;--muted:#7a7570;--accent:#c8f53a;--accent2:#ff6b35;--green:#3affa0;}
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{background:var(--bg);color:var(--text);font-family:'Geist',sans-serif;min-height:100vh;overflow-x:hidden;}
 body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 50% at 20% -10%,rgba(200,245,58,0.06) 0%,transparent 60%),radial-gradient(ellipse 60% 40% at 80% 110%,rgba(255,107,53,0.05) 0%,transparent 60%);pointer-events:none;z-index:0;}
@@ -80,10 +68,6 @@ textarea::placeholder{color:rgba(122,117,112,0.5);}
 .footer{padding:40px 0 32px;text-align:center;border-top:0.5px solid var(--border);margin-top:60px;}
 .footer p{font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;letter-spacing:0.5px;}
 .error-msg{background:rgba(255,68,68,0.08);border:0.5px solid rgba(255,68,68,0.2);border-radius:10px;padding:12px 16px;font-size:13px;color:#ff8888;margin-top:10px;display:none;}
-.api-note{background:rgba(200,245,58,0.05);border:0.5px solid rgba(200,245,58,0.15);border-radius:10px;padding:14px 18px;font-size:12px;color:var(--muted);margin-bottom:12px;line-height:1.6;}
-.api-note a{color:var(--accent);text-decoration:none;}
-.api-note input{background:var(--bg3);border:0.5px solid var(--border2);border-radius:6px;padding:6px 10px;color:var(--text);font-size:12px;font-family:'DM Mono',monospace;width:100%;margin-top:8px;outline:none;}
-.api-note input:focus{border-color:rgba(200,245,58,0.3);}
 </style>
 </head>
 <body>
@@ -93,7 +77,6 @@ textarea::placeholder{color:rgba(122,117,112,0.5);}
     <div class="logo">Validate<span>It</span></div>
     <div class="nav-tag">BETA · FREE</div>
   </nav>
-
   <div class="hero">
     <div class="hero-kicker">AI-POWERED IDEA VALIDATION</div>
     <h1>Is your idea<br><em>actually</em> good?</h1>
@@ -104,13 +87,6 @@ textarea::placeholder{color:rgba(122,117,112,0.5);}
       <div class="stat"><div class="stat-num">100%</div><div class="stat-lbl">BRUTALLY HONEST</div></div>
     </div>
   </div>
-
-  <div class="api-note">
-    <strong style="color:var(--text);">Free setup:</strong> This tool needs a free Groq API key.
-    Get yours in 1 minute at <a href="https://console.groq.com" target="_blank">console.groq.com</a> → Sign up → API Keys → Create Key. No credit card needed.
-    <input type="password" id="apiKeyInput" placeholder="Paste your Groq API key here: gsk_..." />
-  </div>
-
   <div class="input-card">
     <label class="input-label">YOUR IDEA</label>
     <textarea id="ideaInput" placeholder="e.g. An app that helps freelancers automatically track working hours and generate invoices, targeting Indian freelancers who currently use Excel..." rows="4"></textarea>
@@ -122,18 +98,14 @@ textarea::placeholder{color:rgba(122,117,112,0.5);}
       <div class="opt-chip" onclick="toggleChip(this)">Pivot Ideas</div>
     </div>
   </div>
-
   <button class="btn-validate" id="validateBtn" onclick="validate()">
     <span class="btn-txt">Validate My Idea →</span>
     <div class="spinner"></div>
   </button>
   <div class="error-msg" id="errorMsg"></div>
-
   <div class="result-section" id="resultSection">
     <div class="score-banner">
-      <div class="score-ring" id="scoreRing">
-        <div class="score-num" id="scoreNum">—</div>
-      </div>
+      <div class="score-ring" id="scoreRing"><div class="score-num" id="scoreNum">—</div></div>
       <div class="score-info">
         <div class="score-title" id="scoreTitle">Analysing...</div>
         <div class="score-sub" id="scoreSub"></div>
@@ -166,171 +138,79 @@ textarea::placeholder{color:rgba(122,117,112,0.5);}
       <button class="share-btn" onclick="resetForm()">Validate Another →</button>
     </div>
   </div>
-
-  <footer class="footer">
-    <p>ValidateIt · Built for founders who hate wasting time</p>
-  </footer>
+  <footer class="footer"><p>ValidateIt · Built for founders who hate wasting time</p></footer>
 </div>
-
 <script>
 function toggleChip(el){ el.classList.toggle('on'); }
-
-function scoreColor(s){
-  if(s>=70) return '#3affa0';
-  if(s>=45) return '#c8f53a';
-  return '#ff6b35';
-}
-
+function scoreColor(s){ return s>=70?'#3affa0':s>=45?'#c8f53a':'#ff6b35'; }
 function scoreLabel(s){
   if(s>=75) return ['Strong Opportunity','This idea has real legs. Execution is everything now.'];
   if(s>=55) return ['Viable with Work','Solid foundation but needs refinement before launch.'];
   if(s>=35) return ['Risky Bet','Possible, but the odds are stacked against you right now.'];
   return ['Hard Pass','Significant structural problems. Consider pivoting.'];
 }
-
 async function validate(){
   const idea = document.getElementById('ideaInput').value.trim();
-  const apiKey = document.getElementById('apiKeyInput').value.trim();
-
-  if(!apiKey){
-    showError('Paste your free Groq API key above first. Get one at console.groq.com — takes 1 minute, no card needed.');
-    return;
-  }
-  if(!idea || idea.length < 20){
-    showError('Give me more to work with — describe your idea in at least a sentence.');
-    return;
-  }
-
+  if(!idea || idea.length < 20){ showError('Give me more to work with — describe your idea in at least a sentence.'); return; }
   const chips = [...document.querySelectorAll('.opt-chip.on')].map(c => c.textContent);
   const wantPivot = document.querySelectorAll('.opt-chip')[4].classList.contains('on');
-
   const btn = document.getElementById('validateBtn');
-  btn.disabled = true;
-  btn.classList.add('loading');
+  btn.disabled = true; btn.classList.add('loading');
   document.getElementById('errorMsg').style.display = 'none';
   document.getElementById('resultSection').style.display = 'none';
-
-  const prompt = `You are a brutally honest startup advisor. Analyse this business idea and respond ONLY in valid JSON, no markdown, no extra text, no backticks:
-
-{
-  "viability_score": <number 1-100>,
-  "score_label": "<one punchy sentence verdict>",
-  "market_fit": "<2-3 sentences on target market, demand, timing>",
-  "top_risks": ["<risk 1>","<risk 2>","<risk 3>"],
-  "revenue_models": ["<model 1 with brief explanation>","<model 2>","<model 3>"],
-  "competitors": "<2-3 sentences naming real competitors and how to differentiate>",
-  "pivot_ideas": ["<pivot 1>","<pivot 2>","<pivot 3>"]
-}
-
-Business idea: ${idea}
-Requested sections: ${chips.join(', ')}
-Be specific. Name real markets, real competitors, real numbers. Do not sugarcoat.`;
-
   try {
-    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    const res = await fetch('/api/validate', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + apiKey
-      },
-      body: JSON.stringify({
-        model: 'llama-3.3-70b-versatile',
-        max_tokens: 1024,
-        temperature: 0.7,
-        messages: [
-          { role: 'system', content: 'You are a brutally honest startup advisor. Always respond with valid JSON only. No markdown, no backticks, no extra text.' },
-          { role: 'user', content: prompt }
-        ]
-      })
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ idea, chips })
     });
-
     const data = await res.json();
-
-    if(data.error){
-      throw new Error(data.error.message || 'API error');
-    }
-
-    const raw = data.choices[0].message.content;
-    const clean = raw.replace(/```json|```/g,'').trim();
-    const parsed = JSON.parse(clean);
-    renderResult(parsed, wantPivot);
-
+    if(data.error) throw new Error(data.error);
+    renderResult(data, wantPivot);
   } catch(e) {
-    if(e.message && e.message.includes('401')){
-      showError('Invalid API key. Double-check you copied the full key from console.groq.com');
-    } else if(e instanceof SyntaxError){
-      showError('Got a weird response from AI. Try again — it usually works on retry.');
-    } else {
-      showError('Error: ' + (e.message || 'Something went wrong. Try again.'));
-    }
-    btn.disabled = false;
-    btn.classList.remove('loading');
+    showError('Error: ' + (e.message || 'Something went wrong. Try again.'));
+    btn.disabled = false; btn.classList.remove('loading');
   }
 }
-
 function renderResult(d, showPivot){
   const score = Math.min(100, Math.max(1, d.viability_score || 50));
   const col = scoreColor(score);
   const [label, sub] = scoreLabel(score);
-
   document.getElementById('scoreNum').textContent = score;
   document.getElementById('scoreNum').style.color = col;
   document.getElementById('scoreRing').style.border = '2px solid ' + col;
   document.getElementById('scoreRing').style.boxShadow = '0 0 20px ' + col + '33';
   document.getElementById('scoreTitle').textContent = d.score_label || label;
   document.getElementById('scoreSub').textContent = sub;
-
   document.getElementById('marketContent').innerHTML = '<strong>Market fit:</strong> ' + (d.market_fit || '—');
-
-  const risks = d.top_risks || [];
-  document.getElementById('riskContent').innerHTML = '<ul class="risk-list">' + risks.map(r => '<li>' + r + '</li>').join('') + '</ul>';
-
-  const rev = d.revenue_models || [];
-  document.getElementById('revenueContent').innerHTML = '<ul class="opportunity-list">' + rev.map(r => '<li>' + r + '</li>').join('') + '</ul>';
-
+  document.getElementById('riskContent').innerHTML = '<ul class="risk-list">' + (d.top_risks||[]).map(r=>'<li>'+r+'</li>').join('') + '</ul>';
+  document.getElementById('revenueContent').innerHTML = '<ul class="opportunity-list">' + (d.revenue_models||[]).map(r=>'<li>'+r+'</li>').join('') + '</ul>';
   document.getElementById('competitorContent').innerHTML = d.competitors || '—';
-
   if(showPivot && d.pivot_ideas){
-    const piv = d.pivot_ideas || [];
-    document.getElementById('pivotContent').innerHTML = '<ul class="opportunity-list">' + piv.map(p => '<li>' + p + '</li>').join('') + '</ul>';
+    document.getElementById('pivotContent').innerHTML = '<ul class="opportunity-list">' + d.pivot_ideas.map(p=>'<li>'+p+'</li>').join('') + '</ul>';
     document.getElementById('pivotSection').style.display = 'block';
   }
-
   const btn = document.getElementById('validateBtn');
-  btn.disabled = false;
-  btn.classList.remove('loading');
-
+  btn.disabled = false; btn.classList.remove('loading');
   const rs = document.getElementById('resultSection');
   rs.style.display = 'block';
   rs.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
-
 function showError(msg){
   const e = document.getElementById('errorMsg');
-  e.textContent = msg;
-  e.style.display = 'block';
-  const btn = document.getElementById('validateBtn');
-  btn.disabled = false;
-  btn.classList.remove('loading');
+  e.textContent = msg; e.style.display = 'block';
+  document.getElementById('validateBtn').disabled = false;
+  document.getElementById('validateBtn').classList.remove('loading');
 }
-
 function resetForm(){
   document.getElementById('ideaInput').value = '';
   document.getElementById('resultSection').style.display = 'none';
   document.getElementById('pivotSection').style.display = 'none';
-  document.getElementById('ideaInput').focus();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
-
 function copyReport(){
-  const ids = ['scoreTitle','marketContent','riskContent','revenueContent','competitorContent'];
-  const text = ids.map(id => document.getElementById(id).innerText).join('\n\n');
-  navigator.clipboard.writeText(text).then(() => {
-    const btn = event.target;
-    const orig = btn.textContent;
-    btn.textContent = 'Copied ✓';
-    setTimeout(() => btn.textContent = orig, 2000);
-  });
+  const text = ['scoreTitle','marketContent','riskContent','revenueContent','competitorContent'].map(id=>document.getElementById(id).innerText).join('\n\n');
+  navigator.clipboard.writeText(text).then(()=>{ const b=event.target; const o=b.textContent; b.textContent='Copied ✓'; setTimeout(()=>b.textContent=o,2000); });
 }
 </script>
 </body>
