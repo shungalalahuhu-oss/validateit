@@ -354,7 +354,7 @@ function renderResult(d, showPivot){
   rs.style.display = 'block';
   rs.scrollIntoView({ behavior: 'smooth', block: 'start' });
   if(!isPaid() && FREE_LIMIT - getUses() <= 2 && FREE_LIMIT - getUses() > 0){
-    showError('Heads up — only ' + (FREE_LIMIT - getUses()) + ' free validation' + (FREE_LIMIT - getUses()===1?'':''s'') + ' left.');
+    showError('Heads up — only ' + (FREE_LIMIT - getUses()) + ' free validation' + (FREE_LIMIT - getUses()===1?'':'s') + ' left.');
   }
 }
 
