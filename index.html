@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ValidateIt — AI Business Idea Validator</title>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@300;400;500&family=Geist:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#c8f53a">
 <style>
 :root{--bg:#0a0a0a;--bg2:#111111;--bg3:#1a1a1a;--border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.12);--text:#f0ede8;--muted:#7a7570;--accent:#c8f53a;--accent2:#ff6b35;--green:#3affa0;}
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -16,12 +18,18 @@ nav{padding:20px 0;display:flex;justify-content:space-between;align-items:center
 .logo{font-family:'Instrument Serif',serif;font-size:20px;letter-spacing:-0.3px;color:var(--text);}
 .logo span{color:var(--accent);}
 .nav-tag{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);border:0.5px solid var(--border2);padding:4px 10px;border-radius:4px;letter-spacing:1px;}
-.hero{padding:80px 0 60px;text-align:center;}
+.usage-bar{display:flex;align-items:center;gap:10px;padding:10px 16px;background:var(--bg2);border:0.5px solid var(--border2);border-radius:10px;margin:14px 0;}
+.usage-dots{display:flex;gap:5px;}
+.udot{width:8px;height:8px;border-radius:50%;background:var(--bg3);border:0.5px solid var(--border2);transition:all 0.3s;}
+.udot.used{background:var(--accent);border-color:var(--accent);}
+.usage-text{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-left:auto;}
+.usage-text span{color:var(--text);}
+.hero{padding:60px 0 40px;text-align:center;}
 .hero-kicker{font-family:'DM Mono',monospace;font-size:11px;color:var(--accent);letter-spacing:2px;margin-bottom:24px;display:inline-block;}
-.hero h1{font-family:'Instrument Serif',serif;font-size:clamp(40px,8vw,68px);line-height:1.05;letter-spacing:-1px;color:var(--text);margin-bottom:20px;}
+.hero h1{font-family:'Instrument Serif',serif;font-size:clamp(36px,8vw,68px);line-height:1.05;letter-spacing:-1px;color:var(--text);margin-bottom:20px;}
 .hero h1 em{font-style:italic;color:var(--muted);}
 .hero p{font-size:16px;color:var(--muted);line-height:1.7;max-width:480px;margin:0 auto 40px;}
-.stats-row{display:flex;justify-content:center;gap:32px;margin-bottom:56px;flex-wrap:wrap;}
+.stats-row{display:flex;justify-content:center;gap:32px;margin-bottom:48px;flex-wrap:wrap;}
 .stat{text-align:center;}
 .stat-num{font-family:'Instrument Serif',serif;font-size:28px;color:var(--accent);}
 .stat-lbl{font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;letter-spacing:0.5px;margin-top:2px;}
@@ -41,6 +49,27 @@ textarea::placeholder{color:rgba(122,117,112,0.5);}
 .btn-validate.loading .btn-txt{display:none;}
 .btn-validate.loading .spinner{display:block;}
 @keyframes spin{to{transform:rotate(360deg);}}
+.paywall{display:none;background:var(--bg2);border:1px solid rgba(200,245,58,0.2);border-radius:20px;padding:36px 28px;text-align:center;margin-bottom:12px;position:relative;overflow:hidden;}
+.paywall::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 40% at 50% 0%,rgba(200,245,58,0.05),transparent);pointer-events:none;}
+.paywall-icon{font-size:36px;margin-bottom:16px;}
+.paywall h2{font-family:'Instrument Serif',serif;font-size:28px;color:var(--text);margin-bottom:8px;}
+.paywall p{font-size:14px;color:var(--muted);line-height:1.6;max-width:380px;margin:0 auto 24px;}
+.paywall-price{display:inline-flex;align-items:baseline;gap:4px;margin-bottom:20px;}
+.price-amount{font-family:'Instrument Serif',serif;font-size:48px;color:var(--accent);}
+.price-period{font-size:14px;color:var(--muted);}
+.btn-pay{display:inline-block;padding:14px 36px;background:var(--accent);color:#0a0a0a;font-family:'Geist',sans-serif;font-size:14px;font-weight:600;border:none;border-radius:12px;cursor:pointer;text-decoration:none;transition:all 0.15s;margin-bottom:16px;}
+.btn-pay:hover{background:#d4f840;transform:translateY(-1px);}
+.paywall-features{display:flex;flex-direction:column;gap:8px;margin:0 auto 24px;max-width:280px;text-align:left;}
+.pf-item{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted);}
+.pf-item::before{content:'✓';color:var(--accent);font-weight:600;flex-shrink:0;}
+.license-section{margin-top:20px;padding-top:20px;border-top:0.5px solid var(--border);}
+.license-label{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:1px;margin-bottom:8px;display:block;}
+.license-row{display:flex;gap:8px;}
+.license-input{flex:1;background:var(--bg3);border:0.5px solid var(--border2);border-radius:8px;padding:10px 14px;color:var(--text);font-size:13px;font-family:'DM Mono',monospace;outline:none;}
+.license-input:focus{border-color:rgba(200,245,58,0.4);}
+.btn-license{padding:10px 18px;background:transparent;border:0.5px solid var(--border2);border-radius:8px;color:var(--muted);font-size:12px;font-family:'DM Mono',monospace;cursor:pointer;transition:all 0.15s;white-space:nowrap;}
+.btn-license:hover{color:var(--text);border-color:var(--accent);}
+.license-note{font-size:11px;color:var(--muted);margin-top:8px;font-family:'DM Mono',monospace;}
 .result-section{display:none;margin-top:24px;animation:fadeUp 0.5s ease;}
 @keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
 .score-banner{background:var(--bg2);border:0.5px solid var(--border2);border-radius:16px;padding:24px 28px;margin-bottom:12px;display:flex;align-items:center;gap:20px;}
@@ -68,22 +97,22 @@ textarea::placeholder{color:rgba(122,117,112,0.5);}
 .footer{padding:40px 0 32px;text-align:center;border-top:0.5px solid var(--border);margin-top:60px;}
 .footer p{font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;letter-spacing:0.5px;}
 .error-msg{background:rgba(255,68,68,0.08);border:0.5px solid rgba(255,68,68,0.2);border-radius:10px;padding:12px 16px;font-size:13px;color:#ff8888;margin-top:10px;display:none;}
+.success-msg{background:rgba(58,255,160,0.08);border:0.5px solid rgba(58,255,160,0.2);border-radius:10px;padding:12px 16px;font-size:13px;color:#3affa0;margin-top:10px;display:none;}
 </style>
-  <link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#c8f53a">
 </head>
-  <script>
-  if('serviceWorker' in navigator){
-    navigator.serviceWorker.register('/sw.js');
-  }
-</script>
 <body>
 <div class="noise"></div>
 <div class="container">
   <nav>
     <div class="logo">Validate<span>It</span></div>
-    <div class="nav-tag">BETA · FREE</div>
+    <div class="nav-tag" id="navTag">BETA · FREE</div>
   </nav>
+
+  <div class="usage-bar" id="usageBar">
+    <div class="usage-dots" id="usageDots"></div>
+    <div class="usage-text"><span id="usageLeft">10</span> validations left</div>
+  </div>
+
   <div class="hero">
     <div class="hero-kicker">AI-POWERED IDEA VALIDATION</div>
     <h1>Is your idea<br><em>actually</em> good?</h1>
@@ -94,22 +123,54 @@ textarea::placeholder{color:rgba(122,117,112,0.5);}
       <div class="stat"><div class="stat-num">100%</div><div class="stat-lbl">BRUTALLY HONEST</div></div>
     </div>
   </div>
-  <div class="input-card">
-    <label class="input-label">YOUR IDEA</label>
-    <textarea id="ideaInput" placeholder="e.g. An app that helps freelancers automatically track working hours and generate invoices, targeting Indian freelancers who currently use Excel..." rows="4"></textarea>
-    <div class="options-row">
-      <div class="opt-chip on" onclick="toggleChip(this)">Market Analysis</div>
-      <div class="opt-chip on" onclick="toggleChip(this)">Risk Breakdown</div>
-      <div class="opt-chip on" onclick="toggleChip(this)">Revenue Models</div>
-      <div class="opt-chip on" onclick="toggleChip(this)">Competitor Scan</div>
-      <div class="opt-chip" onclick="toggleChip(this)">Pivot Ideas</div>
+
+  <div class="paywall" id="paywall">
+    <div class="paywall-icon">🔒</div>
+    <h2>You've used all 10 free validations</h2>
+    <p>Unlock unlimited validations for a full month and keep building with confidence.</p>
+    <div class="paywall-features">
+      <div class="pf-item">Unlimited idea validations</div>
+      <div class="pf-item">Full market + competitor analysis</div>
+      <div class="pf-item">Revenue model suggestions</div>
+      <div class="pf-item">Pivot ideas when things look risky</div>
+    </div>
+    <div class="paywall-price">
+      <div class="price-amount">₹199</div>
+      <div class="price-period">/ month</div>
+    </div>
+    <br>
+    <a class="btn-pay" href="https://validateit.lemonsqueezy.com/buy/895656" target="_blank">Unlock Unlimited →</a>
+    <div class="license-section">
+      <label class="license-label">ALREADY PAID? ENTER YOUR LICENSE KEY</label>
+      <div class="license-row">
+        <input class="license-input" id="licenseInput" placeholder="XXXX-XXXX-XXXX-XXXX" />
+        <button class="btn-license" onclick="verifyLicense()">Unlock</button>
+      </div>
+      <div class="license-note">Check your email after payment for the license key</div>
+      <div class="error-msg" id="licenseError"></div>
+      <div class="success-msg" id="licenseSuccess"></div>
     </div>
   </div>
-  <button class="btn-validate" id="validateBtn" onclick="validate()">
-    <span class="btn-txt">Validate My Idea →</span>
-    <div class="spinner"></div>
-  </button>
-  <div class="error-msg" id="errorMsg"></div>
+
+  <div id="mainForm">
+    <div class="input-card">
+      <label class="input-label">YOUR IDEA</label>
+      <textarea id="ideaInput" placeholder="e.g. An app that helps freelancers automatically track working hours and generate invoices, targeting Indian freelancers who currently use Excel..." rows="4"></textarea>
+      <div class="options-row">
+        <div class="opt-chip on" onclick="toggleChip(this)">Market Analysis</div>
+        <div class="opt-chip on" onclick="toggleChip(this)">Risk Breakdown</div>
+        <div class="opt-chip on" onclick="toggleChip(this)">Revenue Models</div>
+        <div class="opt-chip on" onclick="toggleChip(this)">Competitor Scan</div>
+        <div class="opt-chip" onclick="toggleChip(this)">Pivot Ideas</div>
+      </div>
+    </div>
+    <button class="btn-validate" id="validateBtn" onclick="validate()">
+      <span class="btn-txt">Validate My Idea →</span>
+      <div class="spinner"></div>
+    </button>
+    <div class="error-msg" id="errorMsg"></div>
+  </div>
+
   <div class="result-section" id="resultSection">
     <div class="score-banner">
       <div class="score-ring" id="scoreRing"><div class="score-num" id="scoreNum">—</div></div>
@@ -145,9 +206,94 @@ textarea::placeholder{color:rgba(122,117,112,0.5);}
       <button class="share-btn" onclick="resetForm()">Validate Another →</button>
     </div>
   </div>
+
   <footer class="footer"><p>ValidateIt · Built for founders who hate wasting time</p></footer>
 </div>
+
 <script>
+const FREE_LIMIT = 10;
+const STORAGE_KEY = 'validateit_uses';
+const LICENSE_KEY = 'validateit_license';
+const PAID_UNTIL_KEY = 'validateit_paid_until';
+
+function getUses(){ return parseInt(localStorage.getItem(STORAGE_KEY)||'0'); }
+function setUses(n){ localStorage.setItem(STORAGE_KEY, n); }
+
+function isPaid(){
+  const until = localStorage.getItem(PAID_UNTIL_KEY);
+  if(!until) return false;
+  return new Date(until) > new Date();
+}
+
+function updateUsageBar(){
+  const uses = getUses();
+  const left = Math.max(0, FREE_LIMIT - uses);
+  const dots = document.getElementById('usageDots');
+  dots.innerHTML = '';
+  for(let i=0;i<FREE_LIMIT;i++){
+    const d = document.createElement('div');
+    d.className = 'udot' + (i < uses ? ' used' : '');
+    dots.appendChild(d);
+  }
+  document.getElementById('usageLeft').textContent = left;
+  if(isPaid()){
+    document.getElementById('usageBar').style.display = 'none';
+    document.getElementById('navTag').textContent = 'PRO · UNLIMITED';
+    document.getElementById('navTag').style.color = '#c8f53a';
+    document.getElementById('navTag').style.borderColor = 'rgba(200,245,58,0.3)';
+  }
+}
+
+function checkPaywall(){
+  if(isPaid()) return false;
+  if(getUses() >= FREE_LIMIT){
+    document.getElementById('paywall').style.display = 'block';
+    document.getElementById('mainForm').style.display = 'none';
+    document.getElementById('resultSection').style.display = 'none';
+    return true;
+  }
+  return false;
+}
+
+async function verifyLicense(){
+  const key = document.getElementById('licenseInput').value.trim();
+  if(!key){ showLicenseError('Enter your license key first.'); return; }
+  const btn = document.querySelector('.btn-license');
+  btn.textContent = 'Checking...'; btn.disabled = true;
+  try {
+    const res = await fetch('/api/validate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'verify_license', license_key: key })
+    });
+    const data = await res.json();
+    if(data.valid){
+      const until = new Date();
+      until.setMonth(until.getMonth() + 1);
+      localStorage.setItem(PAID_UNTIL_KEY, until.toISOString());
+      localStorage.setItem(LICENSE_KEY, key);
+      document.getElementById('licenseSuccess').textContent = 'Unlocked! Enjoy unlimited validations for 30 days.';
+      document.getElementById('licenseSuccess').style.display = 'block';
+      setTimeout(()=>{
+        document.getElementById('paywall').style.display = 'none';
+        document.getElementById('mainForm').style.display = 'block';
+        updateUsageBar();
+      }, 1500);
+    } else {
+      showLicenseError(data.error || 'Invalid license key. Check your email and try again.');
+    }
+  } catch(e) {
+    showLicenseError('Could not verify. Try again.');
+  }
+  btn.textContent = 'Unlock'; btn.disabled = false;
+}
+
+function showLicenseError(msg){
+  const e = document.getElementById('licenseError');
+  e.textContent = msg; e.style.display = 'block';
+  setTimeout(()=>e.style.display='none', 4000);
+}
+
 function toggleChip(el){ el.classList.toggle('on'); }
 function scoreColor(s){ return s>=70?'#3affa0':s>=45?'#c8f53a':'#ff6b35'; }
 function scoreLabel(s){
@@ -156,7 +302,9 @@ function scoreLabel(s){
   if(s>=35) return ['Risky Bet','Possible, but the odds are stacked against you right now.'];
   return ['Hard Pass','Significant structural problems. Consider pivoting.'];
 }
+
 async function validate(){
+  if(checkPaywall()) return;
   const idea = document.getElementById('ideaInput').value.trim();
   if(!idea || idea.length < 20){ showError('Give me more to work with — describe your idea in at least a sentence.'); return; }
   const chips = [...document.querySelectorAll('.opt-chip.on')].map(c => c.textContent);
@@ -173,14 +321,17 @@ async function validate(){
     });
     const data = await res.json();
     if(data.error) throw new Error(data.error);
+    if(!isPaid()){ setUses(getUses() + 1); }
+    updateUsageBar();
     renderResult(data, wantPivot);
   } catch(e) {
     showError('Error: ' + (e.message || 'Something went wrong. Try again.'));
     btn.disabled = false; btn.classList.remove('loading');
   }
 }
+
 function renderResult(d, showPivot){
-  const score = Math.min(100, Math.max(1, d.viability_score || 50));
+  const score = Math.min(100, Math.max(1, d.viability_score||50));
   const col = scoreColor(score);
   const [label, sub] = scoreLabel(score);
   document.getElementById('scoreNum').textContent = score;
@@ -189,12 +340,12 @@ function renderResult(d, showPivot){
   document.getElementById('scoreRing').style.boxShadow = '0 0 20px ' + col + '33';
   document.getElementById('scoreTitle').textContent = d.score_label || label;
   document.getElementById('scoreSub').textContent = sub;
-  document.getElementById('marketContent').innerHTML = '<strong>Market fit:</strong> ' + (d.market_fit || '—');
-  document.getElementById('riskContent').innerHTML = '<ul class="risk-list">' + (d.top_risks||[]).map(r=>'<li>'+r+'</li>').join('') + '</ul>';
-  document.getElementById('revenueContent').innerHTML = '<ul class="opportunity-list">' + (d.revenue_models||[]).map(r=>'<li>'+r+'</li>').join('') + '</ul>';
-  document.getElementById('competitorContent').innerHTML = d.competitors || '—';
+  document.getElementById('marketContent').innerHTML = '<strong>Market fit:</strong> ' + (d.market_fit||'—');
+  document.getElementById('riskContent').innerHTML = '<ul class="risk-list">'+(d.top_risks||[]).map(r=>'<li>'+r+'</li>').join('')+'</ul>';
+  document.getElementById('revenueContent').innerHTML = '<ul class="opportunity-list">'+(d.revenue_models||[]).map(r=>'<li>'+r+'</li>').join('')+'</ul>';
+  document.getElementById('competitorContent').innerHTML = d.competitors||'—';
   if(showPivot && d.pivot_ideas){
-    document.getElementById('pivotContent').innerHTML = '<ul class="opportunity-list">' + d.pivot_ideas.map(p=>'<li>'+p+'</li>').join('') + '</ul>';
+    document.getElementById('pivotContent').innerHTML = '<ul class="opportunity-list">'+d.pivot_ideas.map(p=>'<li>'+p+'</li>').join('')+'</ul>';
     document.getElementById('pivotSection').style.display = 'block';
   }
   const btn = document.getElementById('validateBtn');
@@ -202,7 +353,11 @@ function renderResult(d, showPivot){
   const rs = document.getElementById('resultSection');
   rs.style.display = 'block';
   rs.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  if(!isPaid() && FREE_LIMIT - getUses() <= 2 && FREE_LIMIT - getUses() > 0){
+    showError('Heads up — only ' + (FREE_LIMIT - getUses()) + ' free validation' + (FREE_LIMIT - getUses()===1?'':''s'') + ' left.');
+  }
 }
+
 function showError(msg){
   const e = document.getElementById('errorMsg');
   e.textContent = msg; e.style.display = 'block';
@@ -213,12 +368,17 @@ function resetForm(){
   document.getElementById('ideaInput').value = '';
   document.getElementById('resultSection').style.display = 'none';
   document.getElementById('pivotSection').style.display = 'none';
+  if(!checkPaywall()) document.getElementById('mainForm').style.display = 'block';
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 function copyReport(){
   const text = ['scoreTitle','marketContent','riskContent','revenueContent','competitorContent'].map(id=>document.getElementById(id).innerText).join('\n\n');
   navigator.clipboard.writeText(text).then(()=>{ const b=event.target; const o=b.textContent; b.textContent='Copied ✓'; setTimeout(()=>b.textContent=o,2000); });
 }
+
+updateUsageBar();
+checkPaywall();
 </script>
+<script>if('serviceWorker' in navigator){ navigator.serviceWorker.register('/sw.js'); }</script>
 </body>
 </html>
