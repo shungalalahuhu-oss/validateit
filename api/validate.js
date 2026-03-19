@@ -10,11 +10,9 @@ export default async function handler(req) {
       }
     });
   }
-
   if(req.method !== 'POST'){
     return new Response(JSON.stringify({ error: 'Method not allowed' }), { status: 405 });
   }
-
   try {
     const body = await req.json();
 
@@ -28,27 +26,37 @@ export default async function handler(req) {
       });
       const lsData = await lsRes.json();
       if(lsData.valid){
-        return new Response(JSON.stringify({ valid: true, expires: lsData.license_key.expires_at }), {
-          status: 200,
-          headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
-        });
+        return new Response(JSON.stringify({ valid: true }), { status: 200, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } });
       } else {
-        return new Response(JSON.stringify({ valid: false, error: 'Invalid or expired license key' }), {
-          status: 200,
-          headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
-        });
+        return new Response(JSON.stringify({ valid: false, error: 'Invalid or expired license key' }), { status: 200, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } });
       }
     }
 
-    const { idea, chips } = body;
-    if(!idea || idea.length < 20){
-      return new Response(JSON.stringify({ error: 'Idea too short' }), { status: 400 });
-    }
-
+    const { idea, ideaB, chips, compare } = body;
     const apiKey = process.env.GROQ_API_KEY;
     if(!apiKey){ return new Response(JSON.stringify({ error: 'Server misconfigured' }), { status: 500 }); }
 
-    const prompt = `You are a brutally honest startup advisor. Analyse this business idea and respond ONLY in valid JSON, no markdown, no backticks, no extra text:
+    let prompt;
+
+    if(compare && ideaB){
+      prompt = `You are a brutally honest startup advisor. Compare these two business ideas and respond ONLY in valid JSON, no markdown, no backticks:
+
+{
+  "score_a": <number 1-100 for idea A>,
+  "score_b": <number 1-100 for idea B>,
+  "verdict_a": "<2-3 sentence honest verdict on idea A>",
+  "verdict_b": "<2-3 sentence honest verdict on idea B>",
+  "final_verdict": "<3-4 sentences on which idea wins and exactly why, be specific>"
+}
+
+Idea A: ${idea}
+Idea B: ${ideaB}
+Be brutally honest. Name real market conditions, real competitors, real reasons.`;
+    } else {
+      if(!idea || idea.length < 20){
+        return new Response(JSON.stringify({ error: 'Idea too short' }), { status: 400 });
+      }
+      prompt = `You are a brutally honest startup advisor. Analyse this business idea and respond ONLY in valid JSON, no markdown, no backticks, no extra text:
 
 {
   "viability_score": <number 1-100>,
@@ -63,6 +71,7 @@ export default async function handler(req) {
 Business idea: ${idea}
 Requested sections: ${(chips||[]).join(', ')}
 Be specific. Name real markets, real competitors, real numbers. Do not sugarcoat.`;
+    }
 
     const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
