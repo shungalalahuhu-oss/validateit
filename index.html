@@ -160,32 +160,9 @@ textarea::placeholder{color:var(--muted);opacity:0.5;}
 .act-b.hl{border-color:var(--a1);color:var(--a1);}
 .act-b.hl:hover{background:rgba(200,245,58,0.08);}
 
-/* USAGE */
-.usage-wrap{background:var(--bg2);border:0.5px solid var(--border2);border-radius:10px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;gap:10px;}
-.usage-dots{display:flex;gap:4px;}
-.udot{width:7px;height:7px;border-radius:50%;background:var(--bg3);border:0.5px solid var(--border2);transition:all 0.3s;}
-.udot.used{background:var(--a1);border-color:var(--a1);}
-.usage-txt{font-family:'Fira Code',monospace;font-size:10px;color:var(--muted2);margin-left:auto;}
-.usage-txt span{color:var(--text);}
 
-/* PAYWALL */
-.paywall{display:none;background:var(--bg2);border:1px solid rgba(200,245,58,0.15);border-radius:18px;padding:32px 24px;text-align:center;margin-bottom:12px;}
-.paywall-ico{font-size:32px;margin-bottom:12px;}
-.paywall h2{font-family:'Clash Display',sans-serif;font-size:24px;color:var(--text);margin-bottom:6px;letter-spacing:-0.3px;}
-.paywall p{font-size:13px;color:var(--muted2);line-height:1.6;max-width:360px;margin:0 auto 20px;}
-.price-row{display:inline-flex;align-items:baseline;gap:3px;margin-bottom:20px;}
-.price-big{font-family:'Clash Display',sans-serif;font-size:44px;color:var(--a1);}
-.price-per{font-size:13px;color:var(--muted2);}
-.pf-list{display:flex;flex-direction:column;gap:6px;margin:0 auto 20px;max-width:260px;text-align:left;}
-.pf-item{font-size:12px;color:var(--muted2);display:flex;align-items:center;gap:8px;}
-.pf-item::before{content:'✓';color:var(--a1);font-weight:700;flex-shrink:0;}
-.license-sec{margin-top:18px;padding-top:18px;border-top:0.5px solid var(--border);}
-.license-row{display:flex;gap:8px;margin-top:8px;}
-.license-input{flex:1;background:var(--bg3);border:0.5px solid var(--border2);border-radius:8px;padding:9px 12px;color:var(--text);font-size:12px;font-family:'Fira Code',monospace;outline:none;}
-.license-input:focus{border-color:rgba(200,245,58,0.3);}
-.btn-unlock{padding:9px 16px;border-radius:8px;border:0.5px solid var(--border2);background:transparent;color:var(--muted2);font-size:11px;font-family:'Fira Code',monospace;cursor:pointer;transition:all 0.15s;white-space:nowrap;}
-.btn-unlock:hover{color:var(--text);border-color:var(--a1);}
-.succ{background:rgba(58,255,160,0.07);border:0.5px solid rgba(58,255,160,0.2);border-radius:8px;padding:10px 14px;font-size:12px;color:#3affa0;margin-top:8px;display:none;}
+
+
 
 .footer{padding:32px 0;text-align:center;border-top:0.5px solid var(--border);margin-top:48px;}
 .footer p{font-size:11px;color:var(--muted);font-family:'Fira Code',monospace;letter-spacing:0.5px;}
@@ -311,10 +288,7 @@ textarea::placeholder{color:var(--muted);opacity:0.5;}
     </div>
   </nav>
   <div class="app-body">
-
-    <div class="usage-wrap" id="usageWrap">
-      <div class="usage-dots" id="usageDots"></div>
-      <div class="usage-txt"><span id="usageLeft">10</span> free validations left</div>
+<div class="usage-txt"><span id="usageLeft">10</span> free validations left</div>
     </div>
 
     <div id="historySection" style="display:none;">
@@ -324,18 +298,7 @@ textarea::placeholder{color:var(--muted);opacity:0.5;}
       </div>
       <div class="history-list" id="historyList"></div>
     </div>
-
-    <div class="paywall" id="paywall">
-      <div class="paywall-ico">🔒</div>
-      <h2>You've used all 10 free validations</h2>
-      <p>Unlock unlimited validations for a full month.</p>
-      <div class="pf-list">
-        <div class="pf-item">Unlimited idea validations</div>
-        <div class="pf-item">Compare mode unlimited</div>
-        <div class="pf-item">PDF report downloads</div>
-        <div class="pf-item">Full history saved</div>
-      </div>
-      <div class="price-row"><div class="price-big">₹199</div><div class="price-per">/ month</div></div>
+<div class="price-row"><div class="price-big">₹199</div><div class="price-per">/ month</div></div>
       <br>
       <a class="btn-primary" href="https://validateit.lemonsqueezy.com/buy/895656" target="_blank" style="display:inline-block;text-decoration:none;">Unlock Unlimited →</a>
       <div class="license-sec">
@@ -457,74 +420,7 @@ textarea::placeholder{color:var(--muted);opacity:0.5;}
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
-const FREE_LIMIT=10;
-const STORAGE_KEY='vi_uses';
-const PAID_UNTIL='vi_paid_until';
-const LICENSE_KEY='vi_license';
-const HISTORY_KEY='vi_history';
-
-let currentMode='single';
-let lastResult=null;
-let lastIdea='';
-
-function getUses(){return parseInt(localStorage.getItem(STORAGE_KEY)||'0');}
-function setUses(n){localStorage.setItem(STORAGE_KEY,n);}
-function isPaid(){const u=localStorage.getItem(PAID_UNTIL);return u&&new Date(u)>new Date();}
-
-function updateUsage(){
-  const uses=getUses();
-  const left=Math.max(0,FREE_LIMIT-uses);
-  const dots=document.getElementById('usageDots');
-  dots.innerHTML='';
-  for(let i=0;i<FREE_LIMIT;i++){
-    const d=document.createElement('div');
-    d.className='udot'+(i<uses?' used':'');
-    dots.appendChild(d);
-  }
-  document.getElementById('usageLeft').textContent=left;
-  if(isPaid()){
-    document.getElementById('usageWrap').style.display='none';
-    document.getElementById('stepInd').textContent='PRO · UNLIMITED';
-    document.getElementById('stepInd').style.color='var(--a1)';
-  }
-}
-
-function checkPaywall(){
-  if(isPaid())return false;
-  if(getUses()>=FREE_LIMIT){
-    document.getElementById('paywall').style.display='block';
-    document.getElementById('mainForm').style.display='none';
-    document.getElementById('resultSection').style.display='none';
-    return true;
-  }
-  return false;
-}
-
-async function verifyLicense(){
-  const key=document.getElementById('licenseInput').value.trim();
-  if(!key){return;}
-  const btn=document.querySelector('.btn-unlock');
-  btn.textContent='Checking...';btn.disabled=true;
-  try{
-    const res=await fetch('/api/validate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'verify_license',license_key:key})});
-    const data=await res.json();
-    if(data.valid){
-      const until=new Date();until.setMonth(until.getMonth()+1);
-      localStorage.setItem(PAID_UNTIL,until.toISOString());
-      localStorage.setItem(LICENSE_KEY,key);
-      document.getElementById('licenseSucc').textContent='Unlocked! Enjoy unlimited validations for 30 days.';
-      document.getElementById('licenseSucc').style.display='block';
-      setTimeout(()=>{document.getElementById('paywall').style.display='none';document.getElementById('mainForm').style.display='block';updateUsage();},1500);
-    } else {
-      const e=document.getElementById('licenseErr');e.textContent=data.error||'Invalid key.';e.style.display='block';
-    }
-  }catch(e){document.getElementById('licenseErr').textContent='Could not verify. Try again.';document.getElementById('licenseErr').style.display='block';}
-  btn.textContent='Unlock';btn.disabled=false;
-}
-
-function goToLanding(){['hiwPage','appPage'].forEach(p=>document.getElementById(p).classList.remove('active'));document.getElementById('landingPage').classList.add('active');window.scrollTo({top:0});}
-function goToHIW(){['landingPage','appPage'].forEach(p=>document.getElementById(p).classList.remove('active'));document.getElementById('hiwPage').classList.add('active');window.scrollTo({top:0});}
-function goToApp(){['landingPage','hiwPage'].forEach(p=>document.getElementById(p).classList.remove('active'));document.getElementById('appPage').classList.add('active');updateUsage();checkPaywall();loadHistory();window.scrollTo({top:0});}
+loadHistory();window.scrollTo({top:0});}
 
 function setMode(m){
   currentMode=m;
@@ -545,7 +441,7 @@ function scoreLabel(s){
 }
 
 async function validate(){
-  if(checkPaywall())return;
+  
   const btn=document.getElementById('validateBtn');
   btn.disabled=true;btn.classList.add('loading');
   document.getElementById('errMsg').style.display='none';
@@ -562,8 +458,8 @@ async function validate(){
       const data=await res.json();
       if(data.error)throw new Error(data.error);
       lastResult=data;
-      if(!isPaid())setUses(getUses()+1);
-      updateUsage();
+      
+      
       saveHistory(idea,data.viability_score||50);
       renderSingle(data,wantPivot);
     } else {
@@ -575,8 +471,8 @@ async function validate(){
       const data=await res.json();
       if(data.error)throw new Error(data.error);
       lastResult=data;
-      if(!isPaid())setUses(getUses()+1);
-      updateUsage();
+      
+      
       renderCompare(data,ideaA,ideaB);
     }
   }catch(e){
@@ -746,7 +642,7 @@ function copyReport(){
   navigator.clipboard.writeText(text).then(()=>{const b=event.target;const o=b.textContent;b.textContent='Copied ✓';setTimeout(()=>b.textContent=o,2000);});
 }
 
-updateUsage();
+
 loadHistory();
 </script>
 <script>if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js');}</script>
